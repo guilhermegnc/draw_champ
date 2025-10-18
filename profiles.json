@@ -1,0 +1,44 @@
+{
+    "sup < 5": {
+        "summoner_name": "lili",
+        "tag_line": "peil",
+        "max_mastery": 4,
+        "quantity": 2,
+        "role": "UTILITY"
+    },
+    "adc < 5": {
+        "summoner_name": "lili",
+        "tag_line": "peil",
+        "max_mastery": 4,
+        "quantity": 2,
+        "role": "BOTTOM"
+    },
+    "mid < 5": {
+        "summoner_name": "lili",
+        "tag_line": "peil",
+        "max_mastery": 4,
+        "quantity": 2,
+        "role": "MIDDLE"
+    },
+    "jg < 5": {
+        "summoner_name": "lili",
+        "tag_line": "peil",
+        "max_mastery": 4,
+        "quantity": 2,
+        "role": "JUNGLE"
+    },
+    "top < 5": {
+        "summoner_name": "lili",
+        "tag_line": "peil",
+        "max_mastery": 4,
+        "quantity": 2,
+        "role": "TOP"
+    },
+    "all < 5": {
+        "summoner_name": "lili",
+        "tag_line": "peil",
+        "max_mastery": 4,
+        "quantity": 2,
+        "role": null
+    }
+}
