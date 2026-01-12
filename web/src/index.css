@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@theme {
+  --color-void: #050505;
+  --color-mist: #e0e0e0;
+  --color-steel: #2a2a2a;
+  
+  /* New Vibrant Accents */
+  --color-solar: #ff4d00;
+  --color-flare: #ff8c00;
+  --color-ember: #ff2a00;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'Inter', sans-serif;
+
+  --animate-spin-slow: spin 8s linear infinite;
+}
+
+@layer base {
+  body {
+    @apply bg-void text-mist font-sans antialiased overflow-x-hidden selection:bg-solar selection:text-white;
+  }
+  
+  /* Global Noise Overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+  
+  /* Custom Scrollbar for Webkit */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-void;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-steel rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-mist;
+  }
+
+  /* Remove number input arrows/spinners */
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+
+  /* Force pointer cursor on interactive elements */
+  button, 
+  a, 
+  [role="button"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="button"],
+  select {
+    @apply cursor-pointer;
+  }
+}
