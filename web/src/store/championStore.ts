@@ -42,7 +42,7 @@ interface ChampionStore {
   createProfile: (summonerName: string, tagLine: string) => Promise<void>;
   deleteProfile: (profileId: string) => void;
   selectProfile: (profileId: string) => Promise<void>;
-  drawChampion: () => Champion[];
+  drawChampion: (quantity?: number) => Champion[];
   
   setFilterRole: (role: string | null) => void;
   setSearchQuery: (query: string) => void;
