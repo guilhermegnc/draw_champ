@@ -5,8 +5,7 @@ import gsap from "gsap";
 import { ChampionCard } from "./ChampionCard";
 
 export function Randomizer() {
-  const { drawChampion, currentProfile, drawCount, setDrawCount } =
-    useChampionStore();
+  const { drawChampion, drawCount, setDrawCount } = useChampionStore();
   const [result, setResult] = useState<any[] | null>(null);
   const [isRolling, setIsRolling] = useState(false);
 
