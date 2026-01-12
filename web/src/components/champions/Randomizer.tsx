@@ -5,7 +5,8 @@ import gsap from "gsap";
 import { ChampionCard } from "./ChampionCard";
 
 export function Randomizer() {
-  const { drawChampion, currentProfile } = useChampionStore();
+  const { drawChampion, currentProfile, drawCount, setDrawCount } =
+    useChampionStore();
   const [result, setResult] = useState<any[] | null>(null);
   const [isRolling, setIsRolling] = useState(false);
 
@@ -13,8 +14,8 @@ export function Randomizer() {
 
   const handleDraw = () => {
     setIsRolling(true);
-    // Determine quantity from profile or default to 1
-    const qty = currentProfile?.quantity || 1;
+    // Use store drawCount (defaults to 1 if not set)
+    const qty = drawCount || 1;
 
     // Simulate roll time
     setTimeout(() => {
@@ -40,16 +41,32 @@ export function Randomizer() {
 
   return (
     <>
-      <button
-        onClick={handleDraw}
-        className="fixed bottom-8 right-8 z-40 bg-mist text-void p-6 rounded-full shadow-2xl hover:scale-110 transition-transform active:scale-95 group"
-      >
-        <DiceFive
-          size={32}
-          weight="fill"
-          className="group-hover:rotate-180 transition-transform duration-500"
-        />
-      </button>
+      <div className="fixed bottom-8 right-8 z-40 flex flex-col items-center gap-4">
+        {/* Quantity Selector */}
+        <div className="bg-void/90 border border-mist/20 rounded-full px-4 py-2 flex items-center gap-2 backdrop-blur-md shadow-xl group hover:border-solar/50 transition-colors">
+          <span className="text-xs font-mono uppercase text-mist/50">Qty</span>
+          <input
+            type="number"
+            min={1}
+            max={5}
+            value={drawCount}
+            onChange={(e) => setDrawCount(Number(e.target.value))}
+            className="w-8 bg-transparent text-center font-bold text-mist outline-none focus:text-solar"
+          />
+        </div>
+
+        {/* Draw Button */}
+        <button
+          onClick={handleDraw}
+          className="bg-mist text-void p-6 rounded-full shadow-2xl hover:scale-110 hover:bg-white hover:text-solar transition-all active:scale-95 group"
+        >
+          <DiceFive
+            size={32}
+            weight="fill"
+            className="group-hover:rotate-180 transition-transform duration-500"
+          />
+        </button>
+      </div>
 
       {(isRolling || result) && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-void/95 backdrop-blur-xl">

@@ -29,6 +29,9 @@ interface ChampionStore {
   maxMastery: number | null;
   sortBy: 'name' | 'mastery';
 
+  // Persistent Settings
+  drawCount: number;
+
   // Profile State
   profiles: Record<string, Profile>;
   currentProfile: Profile | null;
@@ -39,12 +42,13 @@ interface ChampionStore {
   createProfile: (summonerName: string, tagLine: string) => Promise<void>;
   deleteProfile: (profileId: string) => void;
   selectProfile: (profileId: string) => Promise<void>;
-  drawChampion: (quantity?: number) => Champion[];
+  drawChampion: () => Champion[];
   
   setFilterRole: (role: string | null) => void;
   setSearchQuery: (query: string) => void;
   setMaxMastery: (level: number | null) => void;
   setSortBy: (sort: 'name' | 'mastery') => void;
+  setDrawCount: (count: number) => void;
   filter: () => void;
 }
 
@@ -59,6 +63,8 @@ export const useChampionStore = create<ChampionStore>()(
       searchQuery: '',
       maxMastery: null,
       sortBy: 'name',
+      
+      drawCount: 1,
 
       profiles: {},
       currentProfile: null,
@@ -117,14 +123,14 @@ export const useChampionStore = create<ChampionStore>()(
              const masteryData = await riotApi.getMastery(summoner.puuid);
              
              // Map mastery to champions
-             const levelMap = new Map(masteryData.map((m: any) => [m.championId, m.championLevel]));
-             const pointsMap = new Map(masteryData.map((m: any) => [m.championId, m.championPoints]));
+             const levelMap = new Map<number, number>(masteryData.map((m: any) => [m.championId, m.championLevel]));
+             const pointsMap = new Map<number, number>(masteryData.map((m: any) => [m.championId, m.championPoints]));
              
              const { champions } = get();
-             const updatedChampions = champions.map(c => ({
+             const updatedChampions: Champion[] = champions.map(c => ({
                 ...c,
-                mastery: levelMap.get(parseInt(c.key)) || 0,
-                masteryPoints: pointsMap.get(parseInt(c.key)) || 0
+                mastery: Number(levelMap.get(parseInt(c.key))) || 0,
+                masteryPoints: Number(pointsMap.get(parseInt(c.key))) || 0
              }));
              
              set({ champions: updatedChampions, currentProfile: profile, loading: false });
@@ -136,13 +142,16 @@ export const useChampionStore = create<ChampionStore>()(
         }
       },
 
-      drawChampion: (quantity = 1) => {
-        const { filteredChampions } = get();
+      drawChampion: (quantity) => {
+        const { filteredChampions, drawCount } = get();
         if (filteredChampions.length === 0) return [];
         
+        const count = quantity || drawCount;
         const shuffled = [...filteredChampions].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, quantity);
+        return shuffled.slice(0, count);
       },
+
+      setDrawCount: (count) => set({ drawCount: count }),
 
       fetchData: async () => {
         set({ loading: true });
@@ -219,8 +228,9 @@ export const useChampionStore = create<ChampionStore>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ 
           profiles: state.profiles, 
-          currentProfile: state.currentProfile 
-      }), // Persist only profiles
+          currentProfile: state.currentProfile,
+          drawCount: state.drawCount
+      }), // Persist profiles and settings
     }
   )
 );
