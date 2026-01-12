@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000'; // Dev URL
+const API_URL = '/api'; // Use relative path for proxy/rewrites
 
 export interface Profile {
   summoner_name: string;

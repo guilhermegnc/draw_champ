@@ -2,7 +2,7 @@ import { useChampionStore } from "../../store/championStore";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import clsx from "clsx";
 
-const ROLES = ["Fighter", "Tank", "Mage", "Assassin", "Support", "Marksman"];
+const ROLES = ["Top", "Jungle", "Mid", "ADC", "Support"];
 
 export function Filters() {
   const {

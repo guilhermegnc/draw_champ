@@ -8,6 +8,7 @@ interface Champion {
   name: string;
   title: string;
   tags: string[];
+  roles: string[]; // Added roles
   image: {
     full: string;
     sprite: string;
@@ -51,6 +52,14 @@ interface ChampionStore {
   setDrawCount: (count: number) => void;
   filter: () => void;
 }
+
+const ROLE_MAPPING: Record<string, string> = {
+  'TOP': 'Top',
+  'JUNGLE': 'Jungle',
+  'MIDDLE': 'Mid',
+  'BOTTOM': 'ADC',
+  'UTILITY': 'Support'
+};
 
 export const useChampionStore = create<ChampionStore>()(
   persist(
@@ -157,8 +166,45 @@ export const useChampionStore = create<ChampionStore>()(
         set({ loading: true });
         try {
           const version = await riotApi.getDDragonVersion();
-          const data = await riotApi.getChampionData(version);
-          const champions: Champion[] = Object.values(data);
+          
+          // Fetch champion data and role data in parallel
+          const [championDataResponse, roleDataResponse] = await Promise.all([
+            riotApi.getChampionData(version),
+            fetch("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-rune-recommendations.json")
+          ]);
+
+          const data = championDataResponse;
+          const roleData = await roleDataResponse.json();
+          
+          // Create a map of championId (key) to roles
+          const championRolesMap = new Map<string, Set<string>>();
+          
+          roleData.forEach((entry: any) => {
+              const startId = entry.championId.toString();
+               // We need to match this ID with the Champion.key
+               
+               if (!championRolesMap.has(startId)) {
+                   championRolesMap.set(startId, new Set());
+               }
+               
+               entry.runeRecommendations.forEach((rec: any) => {
+                   if (rec.position && rec.position !== 'NONE') {
+                       const mappedRole = ROLE_MAPPING[rec.position];
+                       if (mappedRole) {
+                           championRolesMap.get(startId)?.add(mappedRole);
+                       }
+                   }
+               });
+          });
+
+          const champions: Champion[] = Object.values(data).map((champ: any) => {
+              // champ.key is the ID we use for matching
+              const roles = Array.from(championRolesMap.get(champ.key) || []);
+              return {
+                  ...champ,
+                  roles: roles.length > 0 ? roles : champ.tags // Fallback to tags or empty? CLI doesn't fallback, but allows partial match. Let's just use roles.
+              };
+          });
           
           set({ champions, filteredChampions: champions, version, loading: false });
           
@@ -199,7 +245,7 @@ export const useChampionStore = create<ChampionStore>()(
         let result = champions;
 
         if (filterRole) {
-          result = result.filter(c => c.tags.includes(filterRole));
+          result = result.filter(c => c.roles.includes(filterRole));
         }
 
         if (searchQuery) {
@@ -234,3 +280,4 @@ export const useChampionStore = create<ChampionStore>()(
     }
   )
 );
+

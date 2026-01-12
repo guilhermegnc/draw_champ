@@ -1,5 +1,6 @@
 import { useRef, useEffect } from "react";
 import gsap from "gsap";
+import { Trophy } from "@phosphor-icons/react";
 
 interface ChampionCardProps {
   champion: any;
@@ -45,6 +46,16 @@ export function ChampionCard({ champion, index }: ChampionCardProps) {
 
         <div className="absolute inset-0 bg-gradient-to-t from-void via-void/50 to-transparent opacity-80 group-hover:opacity-60 transition-opacity"></div>
 
+        {/* Mastery Points Badge */}
+        {formatMastery(champion.masteryPoints) && (
+          <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-black/60 border border-white/10 px-2 py-1 rounded-full backdrop-blur-md z-30 translate-y-[-10px] opacity-0 animate-[fade-in-down_0.5s_ease-out_forwards] group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+            <Trophy weight="fill" className="text-yellow-500 w-3 h-3" />
+            <span className="text-[10px] font-mono font-bold text-yellow-100/90 tracking-wider">
+              {formatMastery(champion.masteryPoints)}
+            </span>
+          </div>
+        )}
+
         <div className="absolute bottom-4 left-4 z-20 w-full pr-4">
           <h3 className="font-display text-2xl uppercase tracking-tighter text-mist drop-shadow-lg translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
             {champion.name}
@@ -58,4 +69,11 @@ export function ChampionCard({ champion, index }: ChampionCardProps) {
       </div>
     </div>
   );
+}
+
+function formatMastery(points?: number) {
+  if (!points) return null;
+  if (points >= 1000000) return (points / 1000000).toFixed(1) + "M";
+  if (points >= 1000) return (points / 1000).toFixed(1) + "k";
+  return points.toString();
 }

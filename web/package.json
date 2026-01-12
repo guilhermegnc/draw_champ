@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:api": "concurrently \"vite\" \"cd .. && C:/Users/Guilherme/.local/bin/uv.exe run uvicorn api:app --reload --port 8000\"",
+    "dev:api": "concurrently \"vite\" \"cd .. && C:/Users/Guilherme/.local/bin/uv.exe run uvicorn api.index:app --reload --port 8000\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"

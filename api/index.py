@@ -7,13 +7,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-app = FastAPI()
+app = FastAPI(docs_url="/docs", openapi_url="/openapi.json")
 
 # CORS configuration
 origins = [
     "http://localhost",
     "http://localhost:5173",  # Vite default port
     "http://127.0.0.1:5173",
+    "*" # Allow Vercel deployments
 ]
 
 app.add_middleware(
@@ -27,7 +28,12 @@ app.add_middleware(
 RIOT_API_KEY = os.getenv("RIOT_API_KEY")
 BASE_URL = "https://br1.api.riotgames.com"
 AMERICAS_URL = "https://americas.api.riotgames.com"
-PROFILE_FILE = "profiles.json"
+# Try to find profiles.json in cli folder if it exists, otherwise current
+PROFILE_FILE = os.path.join(os.path.dirname(__file__), '..', 'cli', 'profiles.json')
+
+@app.get("/api")
+def read_root_api():
+    return {"message": "Draw Champ API is running"}
 
 @app.get("/")
 def read_root():
@@ -37,6 +43,11 @@ def read_root():
 def get_profiles():
     if os.path.exists(PROFILE_FILE):
         with open(PROFILE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    # Check current directory as fallback
+    local_profile = "profiles.json"
+    if os.path.exists(local_profile):
+        with open(local_profile, "r", encoding="utf-8") as f:
             return json.load(f)
     return {}
 
