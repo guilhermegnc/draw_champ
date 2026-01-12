@@ -10,14 +10,14 @@ from rich.table import Table
 from InquirerPy import inquirer
 import re
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 RIOT_API_KEY = os.getenv("RIOT_API_KEY")
 BASE_URL = "https://br1.api.riotgames.com"
 
 CHAMPION_DATA = {}
 CHAMPION_ROLES_MAP = {}
-PROFILE_FILE = "profiles.json"
+PROFILE_FILE = os.path.join(os.path.dirname(__file__), '..', 'profiles.json')
 
 # Mapeamento regex → rota oficial da API
 ROLE_MAP = {
