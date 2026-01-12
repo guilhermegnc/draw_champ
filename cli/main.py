@@ -17,7 +17,7 @@ BASE_URL = "https://br1.api.riotgames.com"
 
 CHAMPION_DATA = {}
 CHAMPION_ROLES_MAP = {}
-PROFILE_FILE = os.path.join(os.path.dirname(__file__), '..', 'profiles.json')
+PROFILE_FILE = os.path.join(os.path.dirname(__file__), 'profiles.json')
 
 # Mapeamento regex → rota oficial da API
 ROLE_MAP = {
