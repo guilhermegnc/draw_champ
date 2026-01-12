@@ -3,7 +3,8 @@
     { "source": "/api/(.*)", "destination": "/api/index.py" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
-  "buildCommand": "cd web && npm install --legacy-peer-deps && npm run build",
+  "installCommand": "cd web && npm install --legacy-peer-deps",
+  "buildCommand": "cd web && npm run build",
   "outputDirectory": "web/dist",
   "framework": "vite"
 }
