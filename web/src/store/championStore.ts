@@ -67,7 +67,7 @@ export const useChampionStore = create<ChampionStore>()(
       champions: [],
       filteredChampions: [],
       version: '',
-      loading: false,
+      loading: true,
       filterRole: null,
       searchQuery: '',
       maxMastery: null,
