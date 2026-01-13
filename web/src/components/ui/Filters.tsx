@@ -1,5 +1,5 @@
 import { useChampionStore } from "../../store/championStore";
-import { MagnifyingGlass } from "@phosphor-icons/react";
+import { MagnifyingGlass, ArrowsClockwise } from "@phosphor-icons/react";
 import clsx from "clsx";
 
 const ROLES = ["Top", "Jungle", "Mid", "ADC", "Support"];
@@ -13,6 +13,7 @@ export function Filters() {
     setMaxMastery,
     sortBy,
     setSortBy,
+    refreshMastery,
   } = useChampionStore();
 
   return (
@@ -54,6 +55,22 @@ export function Filters() {
           )}
         >
           {sortBy === "mastery" ? "LVL" : "AZ"}
+        </button>
+
+        <button
+          onClick={() => {
+            const btn = document.getElementById("refresh-btn");
+            if (btn) btn.classList.add("animate-spin");
+            refreshMastery().then(() => {
+              setTimeout(() => {
+                if (btn) btn.classList.remove("animate-spin");
+              }, 500);
+            });
+          }}
+          className="group px-3 py-2 border border-mist/20 bg-transparent text-mist/50 hover:border-solar hover:text-solar transition-all duration-300"
+          title="Update Mastery Data"
+        >
+          <ArrowsClockwise id="refresh-btn" size={16} />
         </button>
 
         <div className="flex items-center gap-2 border border-mist/20 px-3 py-2 bg-mist/5">

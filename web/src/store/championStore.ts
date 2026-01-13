@@ -42,7 +42,8 @@ interface ChampionStore {
   loadProfiles: () => Promise<void>;
   createProfile: (summonerName: string, tagLine: string) => Promise<void>;
   deleteProfile: (profileId: string) => void;
-  selectProfile: (profileId: string) => Promise<void>;
+  selectProfile: (profileId: string, silent?: boolean) => Promise<void>;
+  refreshMastery: () => Promise<void>;
   drawChampion: (quantity?: number) => Champion[];
   
   setFilterRole: (role: string | null) => void;
@@ -123,10 +124,12 @@ export const useChampionStore = create<ChampionStore>()(
         set({ profiles: newProfiles, currentProfile: newCurrent });
       },
 
-      selectProfile: async (profileId) => {
+      selectProfile: async (profileId, silent = false) => {
         const profile = get().profiles[profileId];
         if (profile) {
-           set({ currentProfile: profile, loading: true });
+           if (!silent) set({ currentProfile: profile, loading: true });
+           else set({ currentProfile: profile }); // Ensure current profile is set even if silent
+
            try {
              const summoner = await riotApi.getSummoner(profile.summoner_name, profile.tag_line);
              const masteryData = await riotApi.getMastery(summoner.puuid);
@@ -148,6 +151,14 @@ export const useChampionStore = create<ChampionStore>()(
               console.error("Error loading profile data", e);
               set({ loading: false });
            }
+        }
+      },
+
+      refreshMastery: async () => {
+        const { currentProfile, selectProfile } = get();
+        if (currentProfile) {
+            const profileId = `${currentProfile.summoner_name}#${currentProfile.tag_line}`.toLowerCase();
+            await selectProfile(profileId, true);
         }
       },
 
