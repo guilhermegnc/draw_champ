@@ -31,7 +31,11 @@ AMERICAS_URL = "https://americas.api.riotgames.com"
 # Try to find profiles.json in cli folder if it exists, otherwise current
 PROFILE_FILE = os.path.join(os.path.dirname(__file__), '..', 'cli', 'profiles.json')
 
-@app.get("/api")
+from fastapi import APIRouter
+
+router = APIRouter(prefix="/api")
+
+@router.get("")
 def read_root_api():
     return {"message": "Draw Champ API is running"}
 
@@ -39,7 +43,7 @@ def read_root_api():
 def read_root():
     return {"message": "Draw Champ API is running"}
 
-@app.get("/profiles")
+@router.get("/profiles")
 def get_profiles():
     if os.path.exists(PROFILE_FILE):
         with open(PROFILE_FILE, "r", encoding="utf-8") as f:
@@ -51,7 +55,7 @@ def get_profiles():
             return json.load(f)
     return {}
 
-@app.get("/summoner/{name}/{tag}")
+@router.get("/summoner/{name}/{tag}")
 def get_summoner(name: str, tag: str):
     if not RIOT_API_KEY:
         raise HTTPException(status_code=500, detail="RIOT_API_KEY not configured")
@@ -66,7 +70,7 @@ def get_summoner(name: str, tag: str):
     except requests.exceptions.HTTPError as e:
         raise HTTPException(status_code=response.status_code, detail=str(e))
 
-@app.get("/mastery/{puuid}")
+@router.get("/mastery/{puuid}")
 def get_mastery(puuid: str):
     if not RIOT_API_KEY:
         raise HTTPException(status_code=500, detail="RIOT_API_KEY not configured")
@@ -81,7 +85,7 @@ def get_mastery(puuid: str):
     except requests.exceptions.HTTPError as e:
         raise HTTPException(status_code=response.status_code, detail=str(e))
 
-@app.get("/ddragon-version")
+@router.get("/ddragon-version")
 def get_ddragon_version():
     try:
         response = requests.get("https://ddragon.leagueoflegends.com/api/versions.json")
@@ -89,3 +93,5 @@ def get_ddragon_version():
         return {"version": response.json()[0]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+app.include_router(router)
