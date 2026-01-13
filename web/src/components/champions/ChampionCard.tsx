@@ -26,9 +26,12 @@ export function ChampionCard({ champion, index }: ChampionCardProps) {
   }, []); // Only run once on mount
 
   return (
-    <div
+    <a
       ref={cardRef}
-      className="group relative aspect-[3/4] bg-void overflow-hidden cursor-pointer"
+      href={`https://dpm.lol/champions/${champion.id}/build`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative aspect-[3/4] bg-void overflow-hidden cursor-pointer block"
     >
       {/* Liquid Metal Border Effect */}
       <div className="absolute inset-[-50%] w-[200%] h-[200%] bg-[conic-gradient(from_0deg,transparent_0deg,transparent_80deg,var(--color-solar)_120deg,var(--color-flare)_180deg,transparent_240deg)] opacity-0 group-hover:opacity-100 group-hover:animate-spin-slow transition-opacity duration-500 z-0"></div>
@@ -67,7 +70,7 @@ export function ChampionCard({ champion, index }: ChampionCardProps) {
           </div>
         </div>
       </div>
-    </div>
+    </a>
   );
 }
 
