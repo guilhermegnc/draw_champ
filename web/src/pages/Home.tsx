@@ -6,19 +6,29 @@ import { Randomizer } from "../components/champions/Randomizer";
 import gsap from "gsap";
 
 export function Home() {
-  const { filteredChampions, loading, fetchData, refreshMastery } =
-    useChampionStore();
+  const {
+    filteredChampions,
+    loading,
+    fetchData,
+    refreshMastery,
+    currentProfile,
+  } = useChampionStore();
 
   useEffect(() => {
     fetchData();
 
-    // Auto-refresh mastery every 20 minutes
-    const interval = setInterval(() => {
-      refreshMastery();
-    }, 20 * 60 * 1000);
+    // Auto-refresh mastery every 20 minutes if profile exists
+    let interval: ReturnType<typeof setInterval>;
+    if (currentProfile) {
+      interval = setInterval(() => {
+        refreshMastery();
+      }, 20 * 60 * 1000);
+    }
 
-    return () => clearInterval(interval);
-  }, [fetchData, refreshMastery]);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [fetchData, refreshMastery, currentProfile]);
 
   // Animate Hero text on mount
   useEffect(() => {

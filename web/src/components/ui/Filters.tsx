@@ -14,6 +14,7 @@ export function Filters() {
     sortBy,
     setSortBy,
     refreshMastery,
+    currentProfile,
   } = useChampionStore();
 
   return (
@@ -45,49 +46,53 @@ export function Filters() {
           </button>
         ))}
 
-        <button
-          onClick={() => setSortBy(sortBy === "name" ? "mastery" : "name")}
-          className={clsx(
-            "px-4 py-2 font-mono text-xs uppercase tracking-widest border transition-all duration-300",
-            sortBy === "mastery"
-              ? "bg-flare text-white border-flare shadow-[0_0_15px_rgba(255,140,0,0.4)]"
-              : "bg-transparent text-mist/50 border-mist/20 hover:border-flare hover:text-flare"
-          )}
-        >
-          {sortBy === "mastery" ? "LVL" : "AZ"}
-        </button>
+        {currentProfile && (
+          <>
+            <button
+              onClick={() => setSortBy(sortBy === "name" ? "mastery" : "name")}
+              className={clsx(
+                "px-4 py-2 font-mono text-xs uppercase tracking-widest border transition-all duration-300",
+                sortBy === "mastery"
+                  ? "bg-flare text-white border-flare shadow-[0_0_15px_rgba(255,140,0,0.4)]"
+                  : "bg-transparent text-mist/50 border-mist/20 hover:border-flare hover:text-flare"
+              )}
+            >
+              {sortBy === "mastery" ? "LVL" : "AZ"}
+            </button>
 
-        <button
-          onClick={() => {
-            const btn = document.getElementById("refresh-btn");
-            if (btn) btn.classList.add("animate-spin");
-            refreshMastery().then(() => {
-              setTimeout(() => {
-                if (btn) btn.classList.remove("animate-spin");
-              }, 500);
-            });
-          }}
-          className="group px-3 py-2 border border-mist/20 bg-transparent text-mist/50 hover:border-solar hover:text-solar transition-all duration-300"
-          title="Update Mastery Data"
-        >
-          <ArrowsClockwise id="refresh-btn" size={16} />
-        </button>
+            <button
+              onClick={() => {
+                const btn = document.getElementById("refresh-btn");
+                if (btn) btn.classList.add("animate-spin");
+                refreshMastery().then(() => {
+                  setTimeout(() => {
+                    if (btn) btn.classList.remove("animate-spin");
+                  }, 500);
+                });
+              }}
+              className="group px-3 py-2 border border-mist/20 bg-transparent text-mist/50 hover:border-solar hover:text-solar transition-all duration-300"
+              title="Update Mastery Data"
+            >
+              <ArrowsClockwise id="refresh-btn" size={16} />
+            </button>
 
-        <div className="flex items-center gap-2 border border-mist/20 px-3 py-2 bg-mist/5">
-          <span className="font-mono text-[10px] uppercase opacity-50">
-            Max Mastery:
-          </span>
-          <input
-            type="number"
-            min="0"
-            placeholder="ALL"
-            className="w-12 bg-transparent text-center font-mono text-xs focus:outline-none"
-            onChange={(e) => {
-              const val = e.target.value;
-              setMaxMastery(val === "" ? null : parseInt(val));
-            }}
-          />
-        </div>
+            <div className="flex items-center gap-2 border border-mist/20 px-3 py-2 bg-mist/5">
+              <span className="font-mono text-[10px] uppercase opacity-50">
+                Max Mastery:
+              </span>
+              <input
+                type="number"
+                min="0"
+                placeholder="ALL"
+                className="w-12 bg-transparent text-center font-mono text-xs focus:outline-none"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setMaxMastery(val === "" ? null : parseInt(val));
+                }}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       <div className="relative w-full md:w-64 group">
