@@ -119,7 +119,7 @@ export function Home() {
           `}
         </style>
         <div className="flex flex-col items-center justify-center w-full max-w-[95vw]">
-          <h2 className="hero-text font-display text-[3vw] md:text-[1.5vw] tracking-[0.5em] text-mist/60 uppercase mb-4 self-start md:self-center">
+          <h2 className="hero-text font-display text-[3vw] md:text-[1.5vw] tracking-[0.5em] text-mist/60 uppercase mb-4">
             Master your
           </h2>
           <h1
@@ -135,11 +135,11 @@ export function Home() {
             </span>
             <div className="h-[1px] w-12 md:w-24 bg-mist/30" />
           </div>
-          <h2 className="hero-text font-display text-[3vw] md:text-[1.5vw] tracking-[0.5em] text-mist/60 uppercase mb-4 self-end md:self-center">
+          <h2 className="hero-text font-display text-[3vw] md:text-[1.5vw] tracking-[0.5em] text-mist/60 uppercase mb-4">
             Challenge your
           </h2>
           <h1
-            className="glitch hero-text font-display text-[15vw] leading-[0.8] font-black tracking-tighter text-flare uppercase mix-blend-screen z-10 transition-all duration-700 cursor-default"
+            className="glitch hero-text font-display text-[11vw] leading-[0.8] font-black tracking-tighter text-flare uppercase mix-blend-screen z-10 transition-all duration-700 cursor-default"
             data-text="POOL"
           >
             Pool
