@@ -15,9 +15,6 @@ export function Layout() {
         </div>
         <nav className="pointer-events-auto flex items-center gap-6">
           {/* Navigation Items */}
-          <span className="font-mono text-xs uppercase tracking-widest opacity-50 hidden md:block">
-            V 1.0
-          </span>
           <ProfileManager />
         </nav>
       </header>

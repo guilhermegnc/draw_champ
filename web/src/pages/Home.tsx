@@ -35,7 +35,7 @@ export function Home() {
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border border-mist/20 border-t-mist rounded-full animate-spin"></div>
           <span className="font-mono text-sm uppercase tracking-widest animate-pulse">
-            Initializing Protocol...
+            Initializing...
           </span>
         </div>
       </div>
@@ -44,11 +44,107 @@ export function Home() {
 
   return (
     <div className="w-full">
-      <section className="mb-24 relative">
-        <h2 className="hero-text font-display text-[12vw] leading-[0.85] font-bold tracking-tighter text-mist uppercase opacity-90 break-all select-none">
-          The <span className="text-solar">Void</span> <br /> & The{" "}
-          <span className="text-flare">Legend</span>
-        </h2>
+      <section className="h-[80vh] w-full flex flex-col justify-center items-center relative overflow-hidden">
+        <style>
+          {`
+            @keyframes glitch-skew {
+              0% { transform: skew(0deg); }
+              10% { transform: skew(-2deg); }
+              20% { transform: skew(2deg); }
+              30% { transform: skew(-1deg); }
+              40% { transform: skew(3deg); }
+              50% { transform: skew(-0.5deg); }
+              60% { transform: skew(1deg); }
+              70% { transform: skew(-0.2deg); }
+              80% { transform: skew(0.5deg); }
+              90% { transform: skew(-0.1deg); }
+              100% { transform: skew(0deg); }
+            }
+            @keyframes glitch-anim {
+              0% { clip-path: inset(80% 0 0 0); transform: translate(-2px, 1px); }
+              20% { clip-path: inset(10% 0 60% 0); transform: translate(2px, -1px); }
+              40% { clip-path: inset(50% 0 30% 0); transform: translate(-2px, 2px); }
+              60% { clip-path: inset(20% 0 70% 0); transform: translate(2px, -2px); }
+              80% { clip-path: inset(70% 0 10% 0); transform: translate(-1px, 1px); }
+              100% { clip-path: inset(0 0 80% 0); transform: translate(1px, -1px); }
+            }
+            @keyframes glitch-anim-2 {
+              0% { clip-path: inset(10% 0 80% 0); transform: translate(2px, -1px); }
+              20% { clip-path: inset(80% 0 0 0); transform: translate(-2px, 2px); }
+              40% { clip-path: inset(30% 0 50% 0); transform: translate(2px, -2px); }
+              60% { clip-path: inset(70% 0 20% 0); transform: translate(-1px, 1px); }
+              80% { clip-path: inset(0 0 70% 0); transform: translate(1px, -1px); }
+              100% { clip-path: inset(60% 0 10% 0); transform: translate(-2px, 1px); }
+            }
+            .glitch {
+              position: relative;
+            }
+            .glitch::before,
+            .glitch::after {
+              content: attr(data-text);
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: #09090b;
+              clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+            .glitch::before {
+              left: 2px;
+              text-shadow: -1px 0 #ff00c1;
+              animation: glitch-anim-2 3s infinite linear alternate-reverse;
+              display: none;
+            }
+            .glitch::after {
+              left: -2px;
+              text-shadow: -1px 0 #00fff9;
+              animation: glitch-anim 2.5s infinite linear alternate-reverse;
+              display: none;
+            }
+            .glitch:hover {
+              animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+              color: rgba(255, 255, 255, 0.9); 
+            }
+            .glitch:hover::before {
+              display: block;
+              animation: glitch-anim-2 0.4s infinite linear alternate-reverse;
+              clip-path: inset(0 0 0 0);
+            }
+            .glitch:hover::after {
+              display: block;
+              animation: glitch-anim 0.4s infinite linear alternate-reverse;
+              clip-path: inset(0 0 0 0);
+            }
+          `}
+        </style>
+        <div className="flex flex-col items-center justify-center w-full max-w-[95vw]">
+          <h2 className="hero-text font-display text-[3vw] md:text-[1.5vw] tracking-[0.5em] text-mist/60 uppercase mb-4 self-start md:self-center">
+            Master your
+          </h2>
+          <h1
+            className="glitch hero-text font-display text-[11vw] leading-[0.8] font-black tracking-tighter text-solar uppercase mix-blend-screen z-10 transition-all duration-700 cursor-default"
+            data-text="CHAMPIONS"
+          >
+            Champions
+          </h1>
+          <div className="hero-text flex items-center gap-4 my-8 opacity-80">
+            <div className="h-[1px] w-12 md:w-24 bg-mist/30" />
+            <span className="font-mono text-mist text-lg uppercase tracking-widest">
+              &
+            </span>
+            <div className="h-[1px] w-12 md:w-24 bg-mist/30" />
+          </div>
+          <h2 className="hero-text font-display text-[3vw] md:text-[1.5vw] tracking-[0.5em] text-mist/60 uppercase mb-4 self-end md:self-center">
+            Challenge your
+          </h2>
+          <h1
+            className="glitch hero-text font-display text-[15vw] leading-[0.8] font-black tracking-tighter text-flare uppercase mix-blend-screen z-10 transition-all duration-700 cursor-default"
+            data-text="POOL"
+          >
+            Pool
+          </h1>
+        </div>
       </section>
 
       <Filters />
@@ -62,7 +158,7 @@ export function Home() {
         {filteredChampions.length === 0 && (
           <div className="py-24 text-center border border-mist/10 bg-void/50">
             <p className="font-mono text-mist/50 uppercase tracking-widest">
-              No signals detected in the void.
+              No Champions found.
             </p>
           </div>
         )}

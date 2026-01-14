@@ -11,6 +11,39 @@ export function Randomizer() {
 
   const containerRef = useRef(null);
 
+  const controlsRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const threshold = window.innerHeight * 0.3; // Show after scrolling 30% of viewport
+
+      if (scrollY > threshold) {
+        gsap.to(controlsRef.current, {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: "power3.out",
+          overwrite: true,
+        });
+      } else {
+        gsap.to(controlsRef.current, {
+          opacity: 0,
+          y: 50,
+          duration: 0.5,
+          ease: "power3.out",
+          overwrite: true,
+        });
+      }
+    };
+
+    // Initial check
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const handleDraw = () => {
     setIsRolling(true);
     // Use store drawCount (defaults to 1 if not set)
@@ -40,7 +73,10 @@ export function Randomizer() {
 
   return (
     <>
-      <div className="fixed bottom-8 right-8 z-40 flex flex-col items-center gap-4">
+      <div
+        ref={controlsRef}
+        className="fixed bottom-8 right-8 z-40 flex flex-col items-center gap-4 opacity-0"
+      >
         {/* Quantity Selector */}
         <div className="bg-void/90 border border-mist/20 rounded-full px-4 py-2 flex items-center gap-2 backdrop-blur-md shadow-xl group hover:border-solar/50 transition-colors">
           <span className="text-xs font-mono uppercase text-mist/50">Qty</span>
