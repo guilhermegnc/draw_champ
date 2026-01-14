@@ -124,10 +124,7 @@ export function Randomizer() {
               className="flex flex-wrap items-center justify-center gap-8 p-8 max-w-[90vw] max-h-[90vh] overflow-y-auto"
             >
               {result?.map((champ, i) => (
-                <div
-                  key={champ.key}
-                  className="w-[300px] pointer-events-none scale-125"
-                >
+                <div key={champ.key} className="w-[300px] scale-125">
                   <ChampionCard champion={champ} index={i} />
                 </div>
               ))}
