@@ -44,7 +44,7 @@ export function Home() {
 
   return (
     <div className="w-full">
-      <section className="h-[80vh] w-full flex flex-col justify-center items-center relative overflow-hidden">
+      <section className="h-screen -mt-32 w-full flex flex-col justify-center items-center relative overflow-hidden">
         <style>
           {`
             @keyframes glitch-skew {
@@ -87,7 +87,7 @@ export function Home() {
               left: 0;
               width: 100%;
               height: 100%;
-              background: #09090b;
+              background: var(--color-void);
               clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
             }
             .glitch::before {
@@ -104,7 +104,7 @@ export function Home() {
             }
             .glitch:hover {
               animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
-              color: rgba(255, 255, 255, 0.9); 
+              text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9;
             }
             .glitch:hover::before {
               display: block;
