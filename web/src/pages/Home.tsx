@@ -18,15 +18,42 @@ export function Home() {
     fetchData();
 
     // Auto-refresh mastery every 20 minutes if profile exists
-    let interval: ReturnType<typeof setInterval>;
-    if (currentProfile) {
+    // Optimized to only run when the page is visible to save resources
+    let interval: ReturnType<typeof setInterval> | null = null;
+
+    const startInterval = () => {
+      if (!currentProfile) return;
+
+      // Clear existing if any
+      if (interval) clearInterval(interval);
+
       interval = setInterval(() => {
-        refreshMastery();
+        if (document.visibilityState === "visible") {
+          refreshMastery();
+        }
       }, 20 * 60 * 1000);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        // When becoming visible, we might want to refresh immediately if it's been a while?
+        // For now, just ensuring the interval loop is active/checked is enough.
+        // Actually, the interval keeps running but only executes the callback logic if visible.
+        // But to save even more CPU, we could clear/restart interval.
+        // For simplicity and safety, checking state inside the interval is cheap enough for a 20min timer.
+        // However, the user complained about FPS *whlie* playing, meaning the site is hidden.
+        // So executing the logic inside the interval check is better.
+      }
+    };
+
+    if (currentProfile) {
+      startInterval();
+      document.addEventListener("visibilitychange", handleVisibilityChange);
     }
 
     return () => {
       if (interval) clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [fetchData, refreshMastery, currentProfile]);
 
