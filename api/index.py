@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 import json
 from fastapi import FastAPI, HTTPException
@@ -116,12 +117,32 @@ def get_mastery(puuid: str):
     except requests.exceptions.HTTPError as e:
         raise HTTPException(status_code=response.status_code, detail=str(e))
 
+# Cache for DDragon version
+ddragon_version_cache = {
+    "version": None,
+    "last_fetched": 0
+}
+CACHE_DURATION = 3600  # 1 hour
+
 @router.get("/ddragon-version")
 def get_ddragon_version():
+    current_time = time.time()
+
+    # Check if cache is valid
+    if (ddragon_version_cache["version"] and
+        current_time - ddragon_version_cache["last_fetched"] < CACHE_DURATION):
+        return {"version": ddragon_version_cache["version"]}
+
     try:
         response = requests.get("https://ddragon.leagueoflegends.com/api/versions.json")
         response.raise_for_status()
-        return {"version": response.json()[0]}
+        version = response.json()[0]
+
+        # Update cache
+        ddragon_version_cache["version"] = version
+        ddragon_version_cache["last_fetched"] = current_time
+
+        return {"version": version}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
