@@ -2,6 +2,7 @@ import os
 import time
 import requests
 import json
+import httpx
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -134,7 +135,7 @@ ddragon_version_cache = {
 CACHE_DURATION = 3600  # 1 hour
 
 @router.get("/ddragon-version")
-def get_ddragon_version():
+async def get_ddragon_version(request: Request):
     current_time = time.time()
 
     # Check if cache is valid
