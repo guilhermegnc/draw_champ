@@ -128,19 +128,18 @@ def run_profile(profile):
 
     try:
         puuid = get_summoner_puuid(profile["summoner_name"], profile["tag_line"])
+        mastery_data = get_champion_mastery(puuid)
+
+        filtered_champs = filter_champions_by_mastery(mastery_data, profile.get("max_mastery"))
+        filtered_champs = filter_champions_by_role(filtered_champs, profile.get("role"))
     except Exception as e:
-        console.print(f"[red]Erro ao buscar PUUID: {e}[/red]")
+        console.print(f"[red]Erro ao buscar dados do perfil: {e}[/red]")
         input("Pressione ENTER para voltar ao menu...")
         return
 
     while True:
         clear()
         try:
-            mastery_data = get_champion_mastery(puuid)
-
-            filtered_champs = filter_champions_by_mastery(mastery_data, profile.get("max_mastery"))
-            filtered_champs = filter_champions_by_role(filtered_champs, profile.get("role"))
-
             if not filtered_champs:
                 console.print("[red]Nenhum campeão encontrado com os critérios de filtro.[/red]")
             else:
