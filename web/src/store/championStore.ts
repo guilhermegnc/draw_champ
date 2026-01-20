@@ -171,7 +171,11 @@ export const useChampionStore = create<ChampionStore>()(
         if (filteredChampions.length === 0) return [];
         
         const count = quantity || drawCount;
-        const shuffled = [...filteredChampions].sort(() => 0.5 - Math.random());
+        const shuffled = [...filteredChampions];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
         return shuffled.slice(0, count);
       },
 
