@@ -59,12 +59,14 @@ export function Home() {
 
   // Animate Hero text on mount
   useEffect(() => {
-    gsap.fromTo(
-      ".hero-text",
-      { y: 100, opacity: 0 },
-      { y: 0, opacity: 1, duration: 1.2, ease: "power4.out", stagger: 0.1 }
-    );
-  }, []);
+    if (!loading) {
+      gsap.fromTo(
+        ".hero-text",
+        { y: 100, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1.2, ease: "power4.out", stagger: 0.1 }
+      );
+    }
+  }, [loading]);
 
   if (loading) {
     return (
