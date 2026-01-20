@@ -1,14 +1,17 @@
 import { useEffect, useRef } from "react";
 
 export function BackgroundPatterns() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const staticCanvasRef = useRef<HTMLCanvasElement>(null);
+  const dynamicCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const staticCanvas = staticCanvasRef.current;
+    const dynamicCanvas = dynamicCanvasRef.current;
+    if (!staticCanvas || !dynamicCanvas) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const staticCtx = staticCanvas.getContext("2d");
+    const dynamicCtx = dynamicCanvas.getContext("2d");
+    if (!staticCtx || !dynamicCtx) return;
 
     let w = 0,
       h = 0;
@@ -28,28 +31,42 @@ export function BackgroundPatterns() {
       phase: "in" | "out" | "hold";
     }[] = [];
 
-    const resize = () => {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-    };
-
-    const drawGrid = () => {
+    const drawStaticGrid = () => {
       // Draw static background grid
       const cols = Math.ceil(w / GAP);
       const rows = Math.ceil(h / GAP);
 
-      ctx.clearRect(0, 0, w, h);
+      staticCtx.clearRect(0, 0, w, h);
 
       // Draw base grid (visible gray)
-      ctx.fillStyle = "#2a2a2a";
+      staticCtx.fillStyle = "#2a2a2a";
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const x = c * GAP;
           const y = r * GAP;
-          ctx.fillRect(x, y, DOT_SIZE, DOT_SIZE);
+          staticCtx.fillRect(x, y, DOT_SIZE, DOT_SIZE);
         }
       }
+    };
+
+    const resize = () => {
+      w = window.innerWidth;
+      h = window.innerHeight;
+
+      staticCanvas.width = w;
+      staticCanvas.height = h;
+      dynamicCanvas.width = w;
+      dynamicCanvas.height = h;
+
+      drawStaticGrid();
+    };
+
+    const animate = () => {
+      dynamicCtx.clearRect(0, 0, w, h);
+
+      const cols = Math.ceil(w / GAP);
+      const rows = Math.ceil(h / GAP);
 
       // Update and draw active (blinking) dots
       // remove finished dots
@@ -93,34 +110,56 @@ export function BackgroundPatterns() {
 
         // Draw blinking dot
         // Color: Solar Orange (#ff4d00)
-        ctx.fillStyle = `rgba(255, 77, 0, ${dot.alpha})`;
+        dynamicCtx.fillStyle = `rgba(255, 77, 0, ${dot.alpha})`;
         // Add a glow
-        ctx.shadowBlur = 10 * dot.alpha;
-        ctx.shadowColor = "rgba(255, 77, 0, 0.8)";
+        dynamicCtx.shadowBlur = 10 * dot.alpha;
+        dynamicCtx.shadowColor = "rgba(255, 77, 0, 0.8)";
 
-        ctx.fillRect(dot.col * GAP, dot.row * GAP, DOT_SIZE, DOT_SIZE);
+        dynamicCtx.fillRect(dot.col * GAP, dot.row * GAP, DOT_SIZE, DOT_SIZE);
 
         // Reset shadow for next operations
-        ctx.shadowBlur = 0;
+        dynamicCtx.shadowBlur = 0;
       });
 
-      animationFrameId = requestAnimationFrame(drawGrid);
+      if (!document.hidden) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        cancelAnimationFrame(animationFrameId);
+        animate();
+      }
     };
 
     window.addEventListener("resize", resize);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     resize();
-    drawGrid();
+    if (!document.hidden) {
+      animate();
+    }
 
     return () => {
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 mix-blend-screen"
-    />
+    <>
+      <canvas
+        ref={staticCanvasRef}
+        className="fixed inset-0 pointer-events-none z-0 mix-blend-screen"
+      />
+      <canvas
+        ref={dynamicCanvasRef}
+        className="fixed inset-0 pointer-events-none z-0 mix-blend-screen"
+      />
+    </>
   );
 }
