@@ -8,6 +8,7 @@ export interface Profile {
   max_mastery?: number;
   quantity?: number;
   role?: string;
+  puuid?: string;
 }
 
 export const riotApi = {
