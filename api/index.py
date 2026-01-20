@@ -35,6 +35,13 @@ from fastapi import APIRouter
 
 router = APIRouter(prefix="/api")
 
+# Global cache for profiles
+_profiles_cache = {
+    "path": None,
+    "mtime": 0,
+    "data": None
+}
+
 @router.get("")
 def read_root_api():
     return {"message": "Draw Champ API is running"}
@@ -45,15 +52,39 @@ def read_root():
 
 @router.get("/profiles")
 def get_profiles():
+    # Identify which file to use
+    target_file = None
     if os.path.exists(PROFILE_FILE):
-        with open(PROFILE_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    # Check current directory as fallback
-    local_profile = "profiles.json"
-    if os.path.exists(local_profile):
-        with open(local_profile, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
+        target_file = PROFILE_FILE
+    else:
+        local_profile = "profiles.json"
+        if os.path.exists(local_profile):
+            target_file = local_profile
+
+    if target_file is None:
+        return {}
+
+    try:
+        current_mtime = os.path.getmtime(target_file)
+
+        # Check if cache is valid
+        if (_profiles_cache["path"] == target_file and
+            _profiles_cache["mtime"] == current_mtime and
+            _profiles_cache["data"] is not None):
+            return _profiles_cache["data"]
+
+        # Update cache
+        with open(target_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        _profiles_cache["path"] = target_file
+        _profiles_cache["mtime"] = current_mtime
+        _profiles_cache["data"] = data
+        return data
+
+    except (OSError, json.JSONDecodeError):
+        # Raise to preserve original behavior (500 error on file read/parse issues)
+        raise
 
 @router.get("/summoner/{name}/{tag}")
 def get_summoner(name: str, tag: str):
