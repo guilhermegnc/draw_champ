@@ -1,5 +1,12 @@
 import { useEffect, useRef } from "react";
 
+// Solar/Flare colors
+const COLORS = [
+  "rgba(255, 77, 0, ",
+  "rgba(255, 140, 0, ",
+  "rgba(255, 255, 255, ",
+];
+
 export function BackgroundParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -46,13 +53,6 @@ export function BackgroundParticles() {
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
 
-      // Solar/Flare colors
-      const colors = [
-        "rgba(255, 77, 0, ",
-        "rgba(255, 140, 0, ",
-        "rgba(255, 255, 255, ",
-      ];
-
       particles.forEach((p, i) => {
         p.x += p.vx;
         p.y += p.vy;
@@ -64,7 +64,7 @@ export function BackgroundParticles() {
         if (p.y > h) p.y = 0;
 
         ctx.beginPath();
-        const colorPrefix = colors[i % 3];
+        const colorPrefix = COLORS[i % 3];
         ctx.fillStyle = `${colorPrefix}${p.alpha})`;
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
