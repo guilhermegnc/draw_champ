@@ -135,8 +135,12 @@ export const useChampionStore = create<ChampionStore>()(
              const masteryData = await riotApi.getMastery(summoner.puuid);
              
              // Map mastery to champions
-             const levelMap = new Map<number, number>(masteryData.map((m: any) => [m.championId, m.championLevel]));
-             const pointsMap = new Map<number, number>(masteryData.map((m: any) => [m.championId, m.championPoints]));
+             const levelMap = new Map<number, number>();
+             const pointsMap = new Map<number, number>();
+             masteryData.forEach((m: any) => {
+                levelMap.set(m.championId, m.championLevel);
+                pointsMap.set(m.championId, m.championPoints);
+             });
              
              const { champions } = get();
              const updatedChampions: Champion[] = champions.map(c => ({
