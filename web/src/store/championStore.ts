@@ -94,6 +94,7 @@ export const useChampionStore = create<ChampionStore>()(
            const newProfile: Profile = {
              summoner_name: summoner.gameName || summonerName,
              tag_line: summoner.tagLine || tagLine,
+             puuid: summoner.puuid,
            };
            
            // We need to fetch mastery to confirm/cache?
@@ -131,8 +132,23 @@ export const useChampionStore = create<ChampionStore>()(
            else set({ currentProfile: profile }); // Ensure current profile is set even if silent
 
            try {
-             const summoner = await riotApi.getSummoner(profile.summoner_name, profile.tag_line);
-             const masteryData = await riotApi.getMastery(summoner.puuid);
+             let puuid = profile.puuid;
+
+             if (!puuid) {
+               const summoner = await riotApi.getSummoner(profile.summoner_name, profile.tag_line);
+               puuid = summoner.puuid;
+
+               if (puuid) {
+                 const updatedProfile = { ...profile, puuid };
+                 const profiles = { ...get().profiles, [profileId]: updatedProfile };
+                 // Update both profiles map and currentProfile
+                 set({ profiles, currentProfile: updatedProfile });
+               }
+             }
+
+             if (!puuid) throw new Error("PUUID not found");
+
+             const masteryData = await riotApi.getMastery(puuid);
              
              // Map mastery to champions
              const levelMap = new Map<number, number>(masteryData.map((m: any) => [m.championId, m.championLevel]));
