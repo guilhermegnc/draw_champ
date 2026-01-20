@@ -124,10 +124,16 @@ def run_profile(profile):
     get_champion_data()
     load_champion_roles_from_community_dragon()
 
+    try:
+        puuid = get_summoner_puuid(profile["summoner_name"], profile["tag_line"])
+    except Exception as e:
+        console.print(f"[red]Erro ao buscar PUUID: {e}[/red]")
+        input("Pressione ENTER para voltar ao menu...")
+        return
+
     while True:
         clear()
         try:
-            puuid = get_summoner_puuid(profile["summoner_name"], profile["tag_line"])
             mastery_data = get_champion_mastery(puuid)
 
             filtered_champs = filter_champions_by_mastery(mastery_data, profile.get("max_mastery"))
