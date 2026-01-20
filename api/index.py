@@ -1,13 +1,20 @@
 import os
-import requests
+import httpx
 import json
-from fastapi import FastAPI, HTTPException
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, HTTPException, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 load_dotenv()
 
-app = FastAPI(docs_url="/docs", openapi_url="/openapi.json")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.client = httpx.AsyncClient()
+    yield
+    await app.state.client.aclose()
+
+app = FastAPI(docs_url="/docs", openapi_url="/openapi.json", lifespan=lifespan)
 
 # CORS configuration
 origins = [
@@ -30,8 +37,6 @@ BASE_URL = "https://br1.api.riotgames.com"
 AMERICAS_URL = "https://americas.api.riotgames.com"
 # Try to find profiles.json in cli folder if it exists, otherwise current
 PROFILE_FILE = os.path.join(os.path.dirname(__file__), '..', 'cli', 'profiles.json')
-
-from fastapi import APIRouter
 
 router = APIRouter(prefix="/api")
 
@@ -56,7 +61,7 @@ def get_profiles():
     return {}
 
 @router.get("/summoner/{name}/{tag}")
-def get_summoner(name: str, tag: str):
+async def get_summoner(name: str, tag: str, request: Request):
     if not RIOT_API_KEY:
         raise HTTPException(status_code=500, detail="RIOT_API_KEY not configured")
     
@@ -64,14 +69,16 @@ def get_summoner(name: str, tag: str):
     headers = {"X-Riot-Token": RIOT_API_KEY}
     
     try:
-        response = requests.get(url, headers=headers)
+        response = await request.app.state.client.get(url, headers=headers)
         response.raise_for_status()
         return response.json()
-    except requests.exceptions.HTTPError as e:
-        raise HTTPException(status_code=response.status_code, detail=str(e))
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(status_code=e.response.status_code, detail=str(e))
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/mastery/{puuid}")
-def get_mastery(puuid: str):
+async def get_mastery(puuid: str, request: Request):
     if not RIOT_API_KEY:
         raise HTTPException(status_code=500, detail="RIOT_API_KEY not configured")
 
@@ -79,18 +86,22 @@ def get_mastery(puuid: str):
     headers = {"X-Riot-Token": RIOT_API_KEY}
     
     try:
-        response = requests.get(url, headers=headers)
+        response = await request.app.state.client.get(url, headers=headers)
         response.raise_for_status()
         return response.json()
-    except requests.exceptions.HTTPError as e:
-        raise HTTPException(status_code=response.status_code, detail=str(e))
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(status_code=e.response.status_code, detail=str(e))
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/ddragon-version")
-def get_ddragon_version():
+async def get_ddragon_version(request: Request):
     try:
-        response = requests.get("https://ddragon.leagueoflegends.com/api/versions.json")
+        response = await request.app.state.client.get("https://ddragon.leagueoflegends.com/api/versions.json")
         response.raise_for_status()
         return {"version": response.json()[0]}
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(status_code=e.response.status_code, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
