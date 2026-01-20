@@ -45,6 +45,8 @@ def save_profiles(profiles):
 
 def load_champion_roles_from_community_dragon():
     global CHAMPION_ROLES_MAP
+    if CHAMPION_ROLES_MAP:
+        return
     url = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-rune-recommendations.json"
     response = requests.get(url)
     response.raise_for_status()
