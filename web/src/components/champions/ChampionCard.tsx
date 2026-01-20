@@ -62,12 +62,12 @@ export const ChampionCard = memo(function ChampionCard({
           </div>
         )}
 
-        <div className="absolute bottom-4 left-4 z-20 w-full pr-4">
-          <h3 className="font-display text-2xl uppercase tracking-tighter text-mist drop-shadow-lg translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+        <div className="absolute bottom-1 left-1 xl:bottom-4 xl:left-4 z-20 w-full pr-1 xl:pr-4">
+          <h3 className="font-display text-sm xl:text-2xl uppercase tracking-tighter text-mist drop-shadow-lg translate-y-0 xl:translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
             {champion.name}
           </h3>
           <div className="overflow-hidden">
-            <p className="font-mono text-[10px] text-mist/60 uppercase tracking-widest translate-y-full group-hover:translate-y-0 transition-transform duration-500 delay-75">
+            <p className="font-mono text-[8px] xl:text-[10px] text-mist/60 uppercase tracking-widest translate-y-full group-hover:translate-y-0 transition-transform duration-500 delay-75">
               {champion.title}
             </p>
           </div>
