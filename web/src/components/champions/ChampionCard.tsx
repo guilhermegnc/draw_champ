@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, memo } from "react";
 import gsap from "gsap";
 import { Trophy } from "@phosphor-icons/react";
 
@@ -7,7 +7,10 @@ interface ChampionCardProps {
   index: number;
 }
 
-export function ChampionCard({ champion, index }: ChampionCardProps) {
+export const ChampionCard = memo(function ChampionCard({
+  champion,
+  index,
+}: ChampionCardProps) {
   const cardRef = useRef(null);
 
   useEffect(() => {
@@ -72,7 +75,7 @@ export function ChampionCard({ champion, index }: ChampionCardProps) {
       </div>
     </a>
   );
-}
+});
 
 function formatMastery(points?: number) {
   if (!points) return null;
