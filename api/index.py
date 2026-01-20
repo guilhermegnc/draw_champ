@@ -1,5 +1,6 @@
 import os
-import httpx
+import time
+import requests
 import json
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, APIRouter, Request
@@ -40,6 +41,13 @@ PROFILE_FILE = os.path.join(os.path.dirname(__file__), '..', 'cli', 'profiles.js
 
 router = APIRouter(prefix="/api")
 
+# Global cache for profiles
+_profiles_cache = {
+    "path": None,
+    "mtime": 0,
+    "data": None
+}
+
 @router.get("")
 def read_root_api():
     return {"message": "Draw Champ API is running"}
@@ -50,15 +58,39 @@ def read_root():
 
 @router.get("/profiles")
 def get_profiles():
+    # Identify which file to use
+    target_file = None
     if os.path.exists(PROFILE_FILE):
-        with open(PROFILE_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    # Check current directory as fallback
-    local_profile = "profiles.json"
-    if os.path.exists(local_profile):
-        with open(local_profile, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
+        target_file = PROFILE_FILE
+    else:
+        local_profile = "profiles.json"
+        if os.path.exists(local_profile):
+            target_file = local_profile
+
+    if target_file is None:
+        return {}
+
+    try:
+        current_mtime = os.path.getmtime(target_file)
+
+        # Check if cache is valid
+        if (_profiles_cache["path"] == target_file and
+            _profiles_cache["mtime"] == current_mtime and
+            _profiles_cache["data"] is not None):
+            return _profiles_cache["data"]
+
+        # Update cache
+        with open(target_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        _profiles_cache["path"] = target_file
+        _profiles_cache["mtime"] = current_mtime
+        _profiles_cache["data"] = data
+        return data
+
+    except (OSError, json.JSONDecodeError):
+        # Raise to preserve original behavior (500 error on file read/parse issues)
+        raise
 
 @router.get("/summoner/{name}/{tag}")
 async def get_summoner(name: str, tag: str, request: Request):
@@ -94,14 +126,32 @@ async def get_mastery(puuid: str, request: Request):
     except httpx.RequestError as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Cache for DDragon version
+ddragon_version_cache = {
+    "version": None,
+    "last_fetched": 0
+}
+CACHE_DURATION = 3600  # 1 hour
+
 @router.get("/ddragon-version")
-async def get_ddragon_version(request: Request):
+def get_ddragon_version():
+    current_time = time.time()
+
+    # Check if cache is valid
+    if (ddragon_version_cache["version"] and
+        current_time - ddragon_version_cache["last_fetched"] < CACHE_DURATION):
+        return {"version": ddragon_version_cache["version"]}
+
     try:
         response = await request.app.state.client.get("https://ddragon.leagueoflegends.com/api/versions.json")
         response.raise_for_status()
-        return {"version": response.json()[0]}
-    except httpx.HTTPStatusError as e:
-        raise HTTPException(status_code=e.response.status_code, detail=str(e))
+        version = response.json()[0]
+
+        # Update cache
+        ddragon_version_cache["version"] = version
+        ddragon_version_cache["last_fetched"] = current_time
+
+        return {"version": version}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
