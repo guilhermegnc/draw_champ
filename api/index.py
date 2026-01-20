@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+session = requests.Session()
+
 app = FastAPI(docs_url="/docs", openapi_url="/openapi.json")
 
 # CORS configuration
@@ -64,7 +66,7 @@ def get_summoner(name: str, tag: str):
     headers = {"X-Riot-Token": RIOT_API_KEY}
     
     try:
-        response = requests.get(url, headers=headers)
+        response = session.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.HTTPError as e:
@@ -79,7 +81,7 @@ def get_mastery(puuid: str):
     headers = {"X-Riot-Token": RIOT_API_KEY}
     
     try:
-        response = requests.get(url, headers=headers)
+        response = session.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.HTTPError as e:
@@ -88,7 +90,7 @@ def get_mastery(puuid: str):
 @router.get("/ddragon-version")
 def get_ddragon_version():
     try:
-        response = requests.get("https://ddragon.leagueoflegends.com/api/versions.json")
+        response = session.get("https://ddragon.leagueoflegends.com/api/versions.json", timeout=10)
         response.raise_for_status()
         return {"version": response.json()[0]}
     except Exception as e:
