@@ -3,7 +3,6 @@ import { useChampionStore } from "../store/championStore";
 import { ChampionCard } from "../components/champions/ChampionCard";
 import { Filters } from "../components/ui/Filters";
 import { Randomizer } from "../components/champions/Randomizer";
-import gsap from "gsap";
 
 export function Home() {
   const {
@@ -33,7 +32,7 @@ export function Home() {
             refreshMastery();
           }
         },
-        20 * 60 * 1000
+        20 * 60 * 1000,
       );
     };
 
@@ -59,17 +58,6 @@ export function Home() {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [fetchData, refreshMastery, currentProfile]);
-
-  // Animate Hero text on mount
-  useEffect(() => {
-    if (!loading) {
-      gsap.fromTo(
-        ".hero-text",
-        { y: 100, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.2, ease: "power4.out", stagger: 0.1 }
-      );
-    }
-  }, [loading]);
 
   if (loading) {
     return (
