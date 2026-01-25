@@ -241,13 +241,15 @@ export const useChampionStore = create<ChampionStore>()(
               };
           });
           
-          set({ champions, filteredChampions: champions, version, loading: false });
+          set({ champions, filteredChampions: champions, version });
           
           // Re-select current profile if exists to re-apply mastery
           const { currentProfile } = get();
           if (currentProfile) {
               const id = `${currentProfile.summoner_name}#${currentProfile.tag_line}`.toLowerCase();
-              get().selectProfile(id);
+              await get().selectProfile(id);
+          } else {
+              set({ loading: false });
           }
         } catch (error) {
           console.error("Failed to fetch champion data", error);
