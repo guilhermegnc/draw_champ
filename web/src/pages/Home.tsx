@@ -15,49 +15,22 @@ export function Home() {
 
   useEffect(() => {
     fetchData();
+  }, [fetchData]);
 
-    // Auto-refresh mastery every 20 minutes if profile exists
-    // Optimized to only run when the page is visible to save resources
-    let interval: ReturnType<typeof setInterval> | null = null;
+  // Auto-refresh mastery every 20 minutes if profile exists
+  // The user specifically requested this check to run even when the tab is hidden (e.g. while gaming).
+  useEffect(() => {
+    if (!currentProfile) return;
 
-    const startInterval = () => {
-      if (!currentProfile) return;
+    const interval = setInterval(
+      () => {
+        refreshMastery();
+      },
+      20 * 60 * 1000,
+    );
 
-      // Clear existing if any
-      if (interval) clearInterval(interval);
-
-      interval = setInterval(
-        () => {
-          if (document.visibilityState === "visible") {
-            refreshMastery();
-          }
-        },
-        20 * 60 * 1000,
-      );
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        // When becoming visible, we might want to refresh immediately if it's been a while?
-        // For now, just ensuring the interval loop is active/checked is enough.
-        // Actually, the interval keeps running but only executes the callback logic if visible.
-        // But to save even more CPU, we could clear/restart interval.
-        // For simplicity and safety, checking state inside the interval is cheap enough for a 20min timer.
-        // However, the user complained about FPS *whlie* playing, meaning the site is hidden.
-        // So executing the logic inside the interval check is better.
-      }
-    };
-
-    if (currentProfile) {
-      startInterval();
-      document.addEventListener("visibilitychange", handleVisibilityChange);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [fetchData, refreshMastery, currentProfile]);
+    return () => clearInterval(interval);
+  }, [refreshMastery, currentProfile]);
 
   if (loading) {
     return (
